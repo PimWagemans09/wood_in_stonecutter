@@ -2,7 +2,7 @@
     "type": "minecraft:stonecutting",
     "ingredient": "minecraft:pale_oak_planks",
     "result": {
-        "id": "minecraft:pale_oak_stairs",
+        "id": "minecraft:pale_oak_trapdoor",
         "count": 1
     }
 }

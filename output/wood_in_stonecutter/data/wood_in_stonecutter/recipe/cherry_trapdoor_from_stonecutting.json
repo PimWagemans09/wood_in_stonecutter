@@ -2,7 +2,7 @@
     "type": "minecraft:stonecutting",
     "ingredient": "minecraft:cherry_planks",
     "result": {
-        "id": "minecraft:cherry_stairs",
+        "id": "minecraft:cherry_trapdoor",
         "count": 1
     }
 }
