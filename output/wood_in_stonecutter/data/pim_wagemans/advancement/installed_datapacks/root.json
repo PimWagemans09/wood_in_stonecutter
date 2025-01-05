@@ -1,0 +1,18 @@
+{
+  "display": {
+    "title": "Datapacks by Pim_Wagemans",
+    "description": "Mc username: Pim_Wagemans\nGithub: PimWagemans09",
+    "icon": {
+      "id": "minecraft:player_head",
+      "components": { "profile": "pim_wagemans" }
+    },
+    "background": "minecraft:textures/block/gray_concrete.png",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

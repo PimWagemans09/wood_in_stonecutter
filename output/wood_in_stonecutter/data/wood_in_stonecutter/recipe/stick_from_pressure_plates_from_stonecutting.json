@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "#minecraft:wooden_pressure_plates",
+  "result": {
+    "id": "minecraft:stick",
+    "count": 3
+  }
+}

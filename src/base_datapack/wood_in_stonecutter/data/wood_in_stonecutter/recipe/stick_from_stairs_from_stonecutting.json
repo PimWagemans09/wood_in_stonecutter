@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "#wood_in_stonecutter:wooden_stairs",
+  "result": {
+    "id": "minecraft:stick",
+    "count": 2
+  }
+}

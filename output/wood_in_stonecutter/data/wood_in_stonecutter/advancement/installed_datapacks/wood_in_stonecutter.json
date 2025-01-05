@@ -1,0 +1,17 @@
+{
+  "display": {
+    "title": "Wood in stonecutter",
+    "description": "This allows you to craft wooden items in a stonecutter",
+    "icon": {
+      "id": "minecraft:stonecutter"
+    },
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "parent": "pim_wagemans:installed_datapacks/root",
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}
