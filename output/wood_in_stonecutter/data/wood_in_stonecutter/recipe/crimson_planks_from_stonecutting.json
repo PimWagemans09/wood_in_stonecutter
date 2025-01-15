@@ -1,6 +1,9 @@
 {
     "type": "minecraft:stonecutting",
-    "ingredient": "minecraft:crimson_stem",
+    "ingredient": [
+        "minecraft:crimson_stem",
+        "minecraft:stripped_crimson_stem"
+    ],
     "result": {
         "id": "minecraft:crimson_planks",
         "count": 4

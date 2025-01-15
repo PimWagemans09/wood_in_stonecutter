@@ -1,6 +1,9 @@
 {
     "type": "minecraft:stonecutting",
-    "ingredient": "minecraft:spruce_log",
+    "ingredient": [
+        "minecraft:spruce_log",
+        "minecraft:stripped_spruce_log"
+    ],
     "result": {
         "id": "minecraft:spruce_boat",
         "count": 1

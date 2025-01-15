@@ -1,6 +1,9 @@
 {
     "type": "minecraft:stonecutting",
-    "ingredient": "minecraft:bamboo_block",
+    "ingredient": [
+        "minecraft:bamboo_block",
+        "minecraft:stripped_bamboo_block"
+    ],
     "result": {
         "id": "minecraft:bamboo_raft",
         "count": 1

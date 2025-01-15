@@ -144,17 +144,33 @@ for template in template_dir.iterdir():
             print(f"  - Generating: {output_file.name}")
 
         output_data = copy.deepcopy(template_data)
-        parsed_template_ingredient = replace_woodtype_placeholders(
-            template_data["ingredient"], woodtype
-        )
-        if (
-            parsed_template_ingredient[1]
-            and parsed_template_ingredient[2]
-            and parsed_template_ingredient[3]
-        ):
-            output_data["ingredient"] = parsed_template_ingredient[0]
-        else:
-            continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the recipe doesn't use
+        if isinstance(template_data["ingredient"], str):
+            parsed_template_ingredient = replace_woodtype_placeholders(
+                template_data["ingredient"], woodtype
+            )
+            if (
+                parsed_template_ingredient[1]
+                and parsed_template_ingredient[2]
+                and parsed_template_ingredient[3]
+            ):
+                output_data["ingredient"] = parsed_template_ingredient[0]
+            else:
+                continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the recipe doesn't use
+        elif isinstance(template_data["ingredient"], list):
+            temp_ingredient_list = []
+            for unparsed_ingredient in template_data["ingredient"]:
+                parsed_template_ingredient = replace_woodtype_placeholders(
+                    unparsed_ingredient, woodtype
+                )
+                if (
+                    parsed_template_ingredient[1]
+                    and parsed_template_ingredient[2]
+                    and parsed_template_ingredient[3]
+                ):
+                    temp_ingredient_list.append(parsed_template_ingredient[0])
+                else:
+                    continue  # skip this ingredient for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the recipe doesn't use
+            output_data["ingredient"] = temp_ingredient_list
 
         parsed_template_result = replace_woodtype_placeholders(
             template_data["result"]["id"], woodtype
