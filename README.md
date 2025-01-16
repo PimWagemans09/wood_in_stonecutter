@@ -27,4 +27,5 @@ wood in stonecutter is a datapack that allows you to craft wooden items in a sto
 - boats / rafts(bamboo) - warped & crimson don't have boats
 - planks
 
-NOTE: On 1.21.4 when you add the datapack during world creation the game may tell you that the datapack whas made for an older version of Minecraft. But this datapack is compatible with the newer version so you can ignore this warning
+> [!NOTE]
+> On 1.21.4 when you add the datapack during world creation the game may tell you that the datapack whas made for an older version of Minecraft. But this datapack is compatible with the newer version so you can ignore this warning
