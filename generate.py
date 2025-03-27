@@ -2,7 +2,6 @@ import pathlib
 import shutil
 import json
 import copy
-from typing import Tuple
 import argparse
 
 
@@ -119,26 +118,19 @@ for template in template_dir.iterdir():
         ):
             output_file = recipe_dir / parsed_template_name[0]
         else:
-            continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the recipe doesn't use
+            continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the woodtype doesn't have
 
         if output_file.exists():
             base_file_name = output_file.stem
             base_file_extension = output_file.suffix
-            for idx in range(2, 1001):
+            idx = 2
+            while True:
                 new_file_name = base_file_name + "_" + str(idx) + base_file_extension
                 output_file = recipe_dir / new_file_name
                 idx += 1
                 if not output_file.exists():
                     break
 
-            if idx == 1001:
-                print("too many files with the same name!")
-                if not displayed_too_many_files_warning:
-                    displayed_too_many_files_warning = True
-                    print(
-                        "  you seem to be generating more than a 1000 files with the same name.\n  to prevent infinite loops you can not generate more than a 1000 files with the same name\n  this message will be displayed for every file that you create over the limit"
-                    )
-                continue
 
         if not args.no_file_names:
             print(f"  - Generating: {output_file.name}")
