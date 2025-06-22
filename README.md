@@ -3,7 +3,7 @@
 wood in stonecutter is a datapack that allows you to craft wooden items in a stonecutter
 
 > [!NOTE]
-> On 1.21.3, 1.21.4, and 1.21.5 when you add the datapack during world creation the game may tell you that the datapack was made for an older version of Minecraft. This datapack is compatible with the newer version so you can ignore this warning
+> On 1.21.3, 1.21.4, 1.21.5 and 1.21.6 when you add the datapack during world creation the game may tell you that the datapack was made for an older version of Minecraft. This datapack is compatible with the newer versions so you can ignore this warning
 
 ### with planks you can craft:
 
