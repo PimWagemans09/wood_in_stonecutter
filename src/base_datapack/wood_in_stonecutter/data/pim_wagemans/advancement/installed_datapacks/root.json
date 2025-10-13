@@ -4,9 +4,13 @@
     "description": "Mc username: Pim_Wagemans\nGithub: PimWagemans09",
     "icon": {
       "id": "minecraft:player_head",
-      "components": { "profile": "pim_wagemans" }
+      "components": {
+        "minecraft:profile": {
+          "name": "Pim_Wagemans"
+        }
+      }
     },
-    "background": "minecraft:textures/block/gray_concrete.png",
+    "background": "minecraft:block/gray_concrete",
     "show_toast": false,
     "announce_to_chat": false
   },

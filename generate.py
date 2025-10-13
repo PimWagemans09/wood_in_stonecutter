@@ -20,7 +20,7 @@ arg_parser.add_argument(
 )
 arg_parser.add_argument(
     "--world",
-    help='if the "--place-in-world" argument is present the zip file will be placed in the datapacks directory specified in "WORLD"',
+    help='if the "--place-in-world" argument is present the zip file will be placed in the directory specified in "WORLD"',
 )
 arg_parser.add_argument(
     "--no-file-names",
@@ -180,11 +180,12 @@ for template in template_dir.iterdir():
             json.dump(output_data, opened_output_file, indent=4)
 
 print("Fixing bamboo...")  # TODO: dont hardcode this
-with (recipe_dir / "bamboo_planks_from_stonecutting.json").open("r") as file:
+with (recipe_dir / "bamboo_planks_from_stonecutting.json").open("r+") as file:
     bamboo_plank_recipe_data = json.load(file)
-bamboo_plank_recipe_data["result"]["count"] = 2
-with (recipe_dir / "bamboo_planks_from_stonecutting.json").open("w") as file:
+    bamboo_plank_recipe_data["result"]["count"] = 2
+    file.seek(0)
     json.dump(bamboo_plank_recipe_data, file, indent=4)
+    file.truncate()
 
 print("Creating zip archive...")
 shutil.make_archive(
