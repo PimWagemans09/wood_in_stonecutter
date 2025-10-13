@@ -30,6 +30,7 @@ wood in stonecutter is a datapack that allows you to craft wooden items in a sto
 - boats / rafts(bamboo) - warped & crimson don't have boats
 - planks
 - stripped wood blocks[^1] / hyphae(warped & crimson) - bamboo doesnt have wood blocks[^1]
+- shelves
 
 ### with wood blocks[^1] / hyphae(warped & crimson) you can craft:
 
