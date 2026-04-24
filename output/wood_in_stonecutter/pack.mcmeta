@@ -1,7 +1,7 @@
 {
   "pack": {
     "min_format": 88,
-    "max_format": 94,
+    "max_format": 101,
     "description": "This allows you to craft wooden items in a stonecutter"
   }
 }
