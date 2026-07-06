@@ -6,6 +6,6 @@
   ],
   "result": {
     "id": "minecraft:{WOODTYPE}_planks",
-    "count": 4
+    "count": {"CONDITIONAL_REPLACEMENT":{"bamboo":  2, "*":  4}}
   }
 }

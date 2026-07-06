@@ -4,7 +4,6 @@ import json
 import copy
 import argparse
 
-
 try:
     with open("default_world.txt") as file:
         default_world = file.read().rstrip("\n")
@@ -87,6 +86,26 @@ def replace_woodtype_placeholders(
 
     return (parsed_string, has_log_like_block, has_wood_like_block, has_boat_like_item)
 
+def _replace_conditional_replacements_inner(data: dict, woodtype: str):
+    if "CONDITIONAL_REPLACEMENT" in data:
+        replacement_data: dict = data["CONDITIONAL_REPLACEMENT"]
+        if woodtype in replacement_data:
+            return replacement_data[woodtype]
+        else:
+            return replacement_data["*"]
+    else:
+        return replace_conditional_replacements(data, woodtype)
+
+def replace_conditional_replacements(data: dict, woodtype: str) -> dict:
+    for key, value in data.items():
+        if isinstance(value, dict):
+            data[key] = _replace_conditional_replacements_inner(value, woodtype)
+        if isinstance(value, list):
+            for idx, item in enumerate(value):
+                if isinstance(item, dict):
+                    value[idx] = _replace_conditional_replacements_inner(item, woodtype)
+
+    return data
 
 print("Clearing output directory...")
 output_dir = pathlib.Path("./output").resolve()
@@ -120,6 +139,8 @@ for template in template_dir.iterdir():
         else:
             continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the woodtype doesn't have
 
+
+
         if output_file.exists():
             base_file_name = output_file.stem
             base_file_extension = output_file.suffix
@@ -136,6 +157,7 @@ for template in template_dir.iterdir():
             print(f"  - Generating: {output_file.name}")
 
         output_data = copy.deepcopy(template_data)
+        output_data = replace_conditional_replacements(output_data, woodtype[0])
         if isinstance(template_data["ingredient"], str):
             parsed_template_ingredient = replace_woodtype_placeholders(
                 template_data["ingredient"], woodtype
@@ -178,14 +200,6 @@ for template in template_dir.iterdir():
 
         with output_file.open("w") as opened_output_file:
             json.dump(output_data, opened_output_file, indent=4)
-
-print("Fixing bamboo...")  # TODO: dont hardcode this
-with (recipe_dir / "bamboo_planks_from_stonecutting.json").open("r+") as file:
-    bamboo_plank_recipe_data = json.load(file)
-    bamboo_plank_recipe_data["result"]["count"] = 2
-    file.seek(0)
-    json.dump(bamboo_plank_recipe_data, file, indent=4)
-    file.truncate()
 
 print("Creating zip archive...")
 shutil.make_archive(
