@@ -117,6 +117,8 @@ template_dir = src_dir / "templates"
 print("Copying base datapack to output...")
 shutil.copytree(str(src_dir / "base_datapack"), str(output_dir), dirs_exist_ok=True)
 
+generated_files = 0
+
 recipe_dir = (
     output_dir / "wood_in_stonecutter" / "data" / "wood_in_stonecutter" / "recipe"
 )
@@ -200,6 +202,9 @@ for template in template_dir.iterdir():
 
         with output_file.open("w") as opened_output_file:
             json.dump(output_data, opened_output_file, indent=4)
+        generated_files += 1
+
+print(f"Generated {generated_files} files")
 
 print("Creating zip archive...")
 shutil.make_archive(
