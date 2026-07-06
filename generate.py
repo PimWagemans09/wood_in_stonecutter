@@ -1,7 +1,6 @@
 import pathlib
 import shutil
 import json
-import copy
 import argparse
 
 with open("generation_info.json", "r") as f:
@@ -16,8 +15,6 @@ arg_parser.add_argument(
 )
 
 args = arg_parser.parse_args()
-
-displayed_too_many_files_warning = False
 
 def delete_contents_of_dir(pth: pathlib.Path):
     for child in pth.iterdir():
@@ -102,8 +99,8 @@ for src_subdir, out_subdir_raw in generation_info["src_dir_to_output_dir_mapping
                 continue
             if generated_files[idx] is None:
                 continue
-
-            print(f"  - {out_subdir_raw}/{generated_filenames[idx]}...")
+            if not args.no_file_names:
+                print(f"  - {out_subdir_raw}/{generated_filenames[idx]}...")
             generated_file_data = json.loads(generated_files[idx])
             generated_file_data = replace_conditional_replacements(generated_file_data, idx)
             outfile = out_subdir / generated_filenames[idx]
@@ -120,6 +117,4 @@ shutil.make_archive(
     str(output_dir / base_dir.name),
 )
 
-print(
-    "Done! The datapack can be found as a directory and as a zip archive in the output directory"
-)
+print("Done!")
