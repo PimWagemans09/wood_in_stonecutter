@@ -18,22 +18,22 @@ wood in stonecutter is a datapack that allows you to craft wooden items in a sto
 - trapdoors
 - sticks
 
-### with logs / stems(warped & crimson) / blocks(bamboo) you can craft:
+### with logs you can craft:
 
-- boats / rafts(bamboo) - warped & crimson don't have boats
-- stripped logs / stems(warped & crimson) / blocks(bamboo)
-- wood blocks[^1] / hyphae(warped & crimson) - bamboo doesnt have wood blocks[^1]
 - planks
+- boats - warped & crimson don't have boats
+- stripped logs
+- wood blocks[^1] - bamboo doesn't have wood blocks[^1]
 
-### with stripped logs / stems(warped & crimson) / blocks(bamboo) you can craft:
+### with stripped logs you can craft:
 
-- boats / rafts(bamboo) - warped & crimson don't have boats
 - planks
-- stripped wood blocks[^1] / hyphae(warped & crimson) - bamboo doesnt have wood blocks[^1]
+- boats - warped & crimson don't have boats
+- stripped wood blocks[^1] - bamboo doesnt have stripped wood blocks[^1]
 - shelves
 
-### with wood blocks[^1] / hyphae(warped & crimson) you can craft:
+### with wood blocks[^1] you can craft:
 
-- stripped wood blocks[^1] / hyphae(warped & crimson) - bamboo doesnt have wood blocks[^1]
+- stripped wood blocks[^1]
 
 [^1]: with "wood blocks" i mean the ones with bark on all six sides
