@@ -4,23 +4,11 @@ import json
 import copy
 import argparse
 
-try:
-    with open("default_world.txt") as file:
-        default_world = file.read().rstrip("\n")
-except FileNotFoundError:
-    default_world = ""
+with open("generation_info.json", "r") as f:
+    generation_info = json.load(f)
 
 arg_parser = argparse.ArgumentParser()
 
-arg_parser.add_argument(
-    "--place-in-world",
-    action="store_true",
-    help='copies the generated zip file into the datapacks directory specified in the "default_world.txt" or in the "--world"  argument if that\'s present',
-)
-arg_parser.add_argument(
-    "--world",
-    help='if the "--place-in-world" argument is present the zip file will be placed in the directory specified in "WORLD"',
-)
 arg_parser.add_argument(
     "--no-file-names",
     action="store_true",
@@ -29,28 +17,7 @@ arg_parser.add_argument(
 
 args = arg_parser.parse_args()
 
-world_datapack_dir = pathlib.Path(default_world)
-
-if args.world != None:
-    world_datapack_dir = pathlib.Path(args.world)
-
 displayed_too_many_files_warning = False
-
-WOODTYPES: list[list[str | None]] = [
-    ["oak", "log", "wood", "boat"],
-    ["spruce", "log", "wood", "boat"],
-    ["bamboo", "block", None, "raft"],
-    ["birch", "log", "wood", "boat"],
-    ["jungle", "log", "wood", "boat"],
-    ["acacia", "log", "wood", "boat"],
-    ["dark_oak", "log", "wood", "boat"],
-    ["mangrove", "log", "wood", "boat"],
-    ["cherry", "log", "wood", "boat"],
-    ["crimson", "stem", "hyphae", None],
-    ["warped", "stem", "hyphae", None],
-    ["pale_oak", "log", "wood", "boat"],
-]
-
 
 def delete_contents_of_dir(pth: pathlib.Path):
     for child in pth.iterdir():
@@ -61,187 +28,97 @@ def delete_contents_of_dir(pth: pathlib.Path):
             child.rmdir()
 
 
-def replace_woodtype_placeholders(
-    string: str, woodtype: list[str | None]
-) -> tuple[str, bool, bool, bool]:
-
-    has_log_like_block = (not r"{WOODTYPE_LOGNAME}" in string) or (woodtype[1] != None)
-    has_wood_like_block = (not r"{WOODTYPE_WOODNAME}" in string) or (
-        woodtype[2] != None
-    )
-    has_boat_like_item = (not r"{WOODTYPE_BOATNAME}" in string) or (woodtype[3] != None)
-
-    parsed_string = string
-
-    parsed_string = parsed_string.replace(r"{WOODTYPE}", woodtype[0])
-
-    if woodtype[1] != None:
-        parsed_string = parsed_string.replace(r"{WOODTYPE_LOGNAME}", woodtype[1])
-
-    if woodtype[2] != None:
-        parsed_string = parsed_string.replace(r"{WOODTYPE_WOODNAME}", woodtype[2])
-
-    if woodtype[3] != None:
-        parsed_string = parsed_string.replace(r"{WOODTYPE_BOATNAME}", woodtype[3])
-
-    return (parsed_string, has_log_like_block, has_wood_like_block, has_boat_like_item)
-
-def _replace_conditional_replacements_inner(data: dict, woodtype: str):
-    if "CONDITIONAL_REPLACEMENT" in data:
-        replacement_data: dict = data["CONDITIONAL_REPLACEMENT"]
-        if woodtype in replacement_data:
-            return replacement_data[woodtype]
+def replace_placeholders(string: str,) -> list[str|None]:
+    results: list[str|None] = []
+    for option_list in generation_info["options"]:
+        temp_string = string
+        for i in range(len(generation_info["placeholders"])):
+            if "{%s}" % generation_info["placeholders"][i] not in temp_string:
+                continue
+            if option_list[i] is None:
+                results.append(None)
+                break
+            temp_string = temp_string.replace("{%s}" % generation_info["placeholders"][i], option_list[i])
         else:
-            return replacement_data["*"]
-    else:
-        return replace_conditional_replacements(data, woodtype)
+            results.append(temp_string)
+    return results
 
-def replace_conditional_replacements(data: dict, woodtype: str) -> dict:
+
+def _replace_conditional_replacements_inner(data: dict, option_list:int):
+    if "CONDITIONAL_REPLACEMENT" in data:
+        placeholder = data["CONDITIONAL_REPLACEMENT"]
+        placeholder_index = generation_info["placeholders"].index(placeholder)
+        if generation_info["options"][option_list][placeholder_index] in data["conditions"]:
+            return data["conditions"][generation_info["options"][option_list][placeholder_index]]
+        else:
+            return data["conditions"]["*"]
+    else:
+        return replace_conditional_replacements(data, option_list)
+
+
+def replace_conditional_replacements(data: dict, option_list:int) -> dict:
     for key, value in data.items():
         if isinstance(value, dict):
-            data[key] = _replace_conditional_replacements_inner(value, woodtype)
+            data[key] = _replace_conditional_replacements_inner(value,option_list)
         if isinstance(value, list):
             for idx, item in enumerate(value):
                 if isinstance(item, dict):
-                    value[idx] = _replace_conditional_replacements_inner(item, woodtype)
+                    value[idx] = _replace_conditional_replacements_inner(item,option_list)
 
     return data
 
-print("Clearing output directory...")
-output_dir = pathlib.Path("./output").resolve()
-delete_contents_of_dir(output_dir)
 
-src_dir = pathlib.Path("./src").resolve()
-template_dir = src_dir / "templates"
+# print("Clearing output directory...")
+output_dir = pathlib.Path(generation_info["dest_dir"]).resolve()
+base_dir = pathlib.Path(generation_info["base_file_structure"]).resolve()
+if (output_dir / base_dir.name).exists():
+    delete_contents_of_dir(output_dir / base_dir.name)
+    (output_dir / base_dir.name).rmdir()
+if (output_dir / (base_dir.name + ".zip")).exists():
+    (output_dir / (base_dir.name + ".zip")).unlink()
+
+template_dir = pathlib.Path(generation_info["src_dir"]).resolve()
 
 print("Copying base datapack to output...")
-shutil.copytree(str(src_dir / "base_datapack"), str(output_dir), dirs_exist_ok=True)
+print(base_dir, output_dir)
+shutil.copytree(str(base_dir), str(output_dir / base_dir.name), dirs_exist_ok=True)
 
-generated_files = 0
+generated_files_nr = 0
 
-recipe_dir = (
-    output_dir / "wood_in_stonecutter" / "data" / "wood_in_stonecutter" / "recipe"
-)
 if not args.no_file_names:
     print("Generating files:")
 else:
     print("Generating files...")
-for template in template_dir.iterdir():
-    with template.open() as template_file:
-        template_data = json.load(template_file)
-    for woodtype in WOODTYPES:
+for src_subdir, out_subdir_raw in generation_info["src_dir_to_output_dir_mapping"].items():
+    src_subdir = template_dir / src_subdir
+    out_subdir = output_dir / base_dir.name / out_subdir_raw
+    for template in src_subdir.iterdir():
+        with template.open("r") as template_file:
+            template_string = template_file.read()
+        generated_files = replace_placeholders(template_string)
+        generated_filenames = replace_placeholders(template.name)
+        for idx, filename in enumerate(generated_filenames):
+            if filename is None:
+                continue
+            if generated_files[idx] is None:
+                continue
 
-        parsed_template_name = replace_woodtype_placeholders(template.name, woodtype)
-        if (
-            parsed_template_name[1]
-            and parsed_template_name[2]
-            and parsed_template_name[3]
-        ):
-            output_file = recipe_dir / parsed_template_name[0]
-        else:
-            continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the woodtype doesn't have
+            print(f"  - {out_subdir_raw}/{generated_filenames[idx]}...")
+            generated_file_data = json.loads(generated_files[idx])
+            generated_file_data = replace_conditional_replacements(generated_file_data, idx)
+            outfile = out_subdir / generated_filenames[idx]
+            with open(outfile, "w") as out_file:
+                json.dump(generated_file_data, out_file, indent=4)
+            generated_files_nr += 1
 
-
-
-        if output_file.exists():
-            base_file_name = output_file.stem
-            base_file_extension = output_file.suffix
-            idx = 2
-            while True:
-                new_file_name = base_file_name + "_" + str(idx) + base_file_extension
-                output_file = recipe_dir / new_file_name
-                idx += 1
-                if not output_file.exists():
-                    break
-
-
-        if not args.no_file_names:
-            print(f"  - Generating: {output_file.name}")
-
-        output_data = copy.deepcopy(template_data)
-        output_data = replace_conditional_replacements(output_data, woodtype[0])
-        if isinstance(template_data["ingredient"], str):
-            parsed_template_ingredient = replace_woodtype_placeholders(
-                template_data["ingredient"], woodtype
-            )
-            if (
-                parsed_template_ingredient[1]
-                and parsed_template_ingredient[2]
-                and parsed_template_ingredient[3]
-            ):
-                output_data["ingredient"] = parsed_template_ingredient[0]
-            else:
-                continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the recipe doesn't use
-        elif isinstance(template_data["ingredient"], list):
-            temp_ingredient_list = []
-            for unparsed_ingredient in template_data["ingredient"]:
-                parsed_template_ingredient = replace_woodtype_placeholders(
-                    unparsed_ingredient, woodtype
-                )
-                if (
-                    parsed_template_ingredient[1]
-                    and parsed_template_ingredient[2]
-                    and parsed_template_ingredient[3]
-                ):
-                    temp_ingredient_list.append(parsed_template_ingredient[0])
-                else:
-                    continue  # skip this ingredient for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the recipe doesn't use
-            output_data["ingredient"] = temp_ingredient_list
-
-        parsed_template_result = replace_woodtype_placeholders(
-            template_data["result"]["id"], woodtype
-        )
-        if (
-            parsed_template_result[1]
-            and parsed_template_result[2]
-            and parsed_template_result[3]
-        ):
-            output_data["result"]["id"] = parsed_template_result[0]
-        else:
-            continue  # skip this template for this woodtype because this template uses a wood-like block, log-like block or a boat-like item that the recipe doesn't use
-
-        with output_file.open("w") as opened_output_file:
-            json.dump(output_data, opened_output_file, indent=4)
-        generated_files += 1
-
-print(f"Generated {generated_files} files")
+print(f"Generated {generated_files_nr} files")
 
 print("Creating zip archive...")
 shutil.make_archive(
-    str(output_dir / "wood_in_stonecutter"),
+    str(output_dir / base_dir.name),
     "zip",
-    str(output_dir / "wood_in_stonecutter"),
+    str(output_dir / base_dir.name),
 )
-
-
-def place_in_dir():
-    global world_datapack_dir, output_dir
-    print("Placing zip archive in world datapacks directory...")
-    if str(world_datapack_dir) == ".":
-        print(
-            '  Couldn\'t place the generated zip archive in the datapacks directory because:\n    -No file called "default_world.txt" containing a path to a datapacks directory was found\n    -No "--world <Path>"  argument containing a path to a datapacks directory was passed to the program'
-        )
-        return
-    if (world_datapack_dir / "wood_in_stonecutter.zip").exists():
-        try:
-            (world_datapack_dir / "wood_in_stonecutter.zip").unlink()
-        except:
-            print(
-                "  Couldn't delete old datapack file please make sure you have the datapack disabled if you have the world open"
-            )
-            return
-    shutil.copy(
-        output_dir / "wood_in_stonecutter.zip",
-        world_datapack_dir / "wood_in_stonecutter.zip",
-    )
-    print(
-        f'  Copied the generated zip archive to the world "{world_datapack_dir.parent.name}"'
-    )
-
-
-if args.place_in_world:
-    place_in_dir()
-
 
 print(
     "Done! The datapack can be found as a directory and as a zip archive in the output directory"

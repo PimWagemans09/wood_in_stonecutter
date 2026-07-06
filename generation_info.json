@@ -1,0 +1,23 @@
+{
+  "placeholders": ["WOODTYPE", "WOODTYPE_LOGNAME", "WOODTYPE_WOODNAME", "WOODTYPE_BOATNAME"],
+  "options": [
+    ["oak", "log", "wood", "boat"],
+    ["spruce", "log", "wood", "boat"],
+    ["bamboo", "block", null, "raft"],
+    ["birch", "log", "wood", "boat"],
+    ["jungle", "log", "wood", "boat"],
+    ["acacia", "log", "wood", "boat"],
+    ["dark_oak", "log", "wood", "boat"],
+    ["mangrove", "log", "wood", "boat"],
+    ["cherry", "log", "wood", "boat"],
+    ["crimson", "stem", "hyphae", null],
+    ["warped", "stem", "hyphae", null],
+    ["pale_oak", "log", "wood", "boat"]
+],
+  "src_dir": "src/templates",
+  "dest_dir": "output",
+  "base_file_structure": "src/base_datapack/wood_in_stonecutter",
+  "src_dir_to_output_dir_mapping": {
+    "": "data/wood_in_stonecutter/recipe"
+  }
+}
