@@ -1,0 +1,3 @@
+[submodule "templator"]
+	path = templator
+	url = https://github.com/PimWagemans09/json_templator
