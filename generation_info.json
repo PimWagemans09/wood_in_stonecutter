@@ -12,7 +12,8 @@
     ["cherry", "log", "wood", "boat"],
     ["crimson", "stem", "hyphae", null],
     ["warped", "stem", "hyphae", null],
-    ["pale_oak", "log", "wood", "boat"]
+    ["pale_oak", "log", "wood", "boat"],
+    ["poplar", "log", "wood", "boat"]
 ],
   "src_dir": "src/templates",
   "dest_dir": "output",
